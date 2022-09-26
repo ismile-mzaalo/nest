@@ -18,9 +18,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { get } from 'http';
 import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
 import { UsersService } from 'src/users/services/users.service';
+import { User } from '../entities/users.entity';
 
 @Controller('users')
 export class UsersController {
@@ -34,8 +34,8 @@ export class UsersController {
 
   @Post('create')
   @HttpCode(204)
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return 'this action create users';
+  async createUser(@Body() body: CreateUserDto): Promise<User> {
+    return this.userService.createUser(body);
   }
 
   @Put(':id')
@@ -50,8 +50,8 @@ export class UsersController {
   async deleteUser(@Param('id') id: string) {}
 
   @Get(':id')
-  getUserById(@Param('id') id: string): string {
-    return `this ${id} user`;
+  getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.userService.getUserById(id);
   }
 
   @Get('redirect')
