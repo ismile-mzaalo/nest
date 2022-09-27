@@ -13,7 +13,7 @@ export class AuthMiddleware implements NestMiddleware {
     const { authorization } = req.headers;
     if (!authorization)
       throw new HttpException('no auth', HttpStatus.FORBIDDEN);
-    if (authorization === 'amamamamamam') next();
+    if (authorization === 'xxx') next();
     else throw new HttpException('no auth', HttpStatus.FORBIDDEN);
   }
 }

@@ -8,6 +8,7 @@ import {
   Param,
   ParseBoolPipe,
   ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
@@ -17,7 +18,6 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
 import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
 import { UsersService } from 'src/users/services/users.service';
 import { User } from '../entities/users.entity';
@@ -28,88 +28,53 @@ export class UsersController {
 
   @Get()
   @Header('Cache-Control', 'none')
-  getUsers(@Req() request: Request): string {
-    return 'this action return users';
+  getUsers() {
+    return this.userService.getAllUsers();
   }
 
   @Post('create')
-  @HttpCode(204)
-  async createUser(@Body() body: CreateUserDto): Promise<User> {
-    return this.userService.createUser(body);
+  async createUser(@Body() createuserDto: CreateUserDto): Promise<User> {
+    return this.userService.createUser(createuserDto);
   }
 
   @Put(':id')
   async updateUser(
     @Param('id') id: string,
-    @Body() updateUserDto: CreateUserDto,
+    @Body() createUserDto: CreateUserDto,
   ) {
-    return `this user ${id} is updated`;
+    return this.userService.updateUser(id, createUserDto);
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {}
+  async deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id);
+  }
 
   @Get(':id')
-  getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  getUserById(@Param('id') id: string): Promise<User> {
     return this.userService.getUserById(id);
   }
 
-  @Get('redirect')
-  @Redirect('https://docs.nestjs.com', 302) //url and optional statuscode
-  getRedirect(@Query('redirect') redirect: string) {
-    if (redirect && redirect === 'true') {
-      return { url: 'https://docs.nestjs.com/v5/' };
-    }
-  }
-
-  // @Get()
-  // users() {
-  //   return this.userService.fetchusers();
-  // }
-
-  //   @Get('posts')
-  //   usersPosts() {
-  //     return [
-  //       {
-  //         name: 'john',
-  //         email: 'john@email.com',
-  //         posts: [
-  //           { id: 1, title: 'post1' },
-  //           { id: 2, title: 'post2' },
-  //         ],
-  //       },
-  //     ];
+  // @Get('redirect')
+  // @Redirect('https://docs.nestjs.com', 302) //url and optional statuscode
+  // getRedirect(@Query('redirect') redirect: string) {
+  //   if (redirect && redirect === 'true') {
+  //     return { url: 'https://docs.nestjs.com/v5/' };
   //   }
+  // }
 
   // @Post('posts')
   // createUsers(@Req() req:Request ,@Res() res:Response) {
   //   console.log(req.body);
   //   res.send("Created");
   // }
-  @Post('create')
-  @UsePipes(new ValidationPipe())
-  create(@Body() userData: CreateUserDto) {
-    console.log(userData);
-    return this.userService.createUser(userData);
-  }
 
-  // @Get(':id')
-  // getUserById(@Param('id',ParseIntPipe) id: string) {
-  //   console.log(id);
-  //   return { id };
+  // @Post('create')
+  // @UsePipes(new ValidationPipe())
+  // create(@Body() userData: CreateUserDto) {
+  //   console.log(userData);
+  //   return this.userService.createUser(userData);
   // }
-
-  // @Get()
-  // users (@Query("sort") sort:string){
-  //     console.log(sort);
-  //     return {sort}
-  // }
-
-  //   @Get()
-  //   users(@Query('sort', ParseBoolPipe) sort: string) {
-  //     console.log(sort);
-  //     return { sort };
-  //   }
 }
 
 // Request Object below :-
