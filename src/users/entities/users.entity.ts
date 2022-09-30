@@ -5,14 +5,20 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid') //uuid v4 -default
   id: string;
 
   @Column({ type: 'varchar' })
   userName: string;
 
   @Column({ unique: true })
-  email: String;
+  email: string;
+
+  @Column({ array: true, nullable: true })
+  hobby: string[];
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth: string;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;

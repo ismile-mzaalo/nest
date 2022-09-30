@@ -37,7 +37,7 @@ export class UsersController {
     return this.userService.createUser(createuserDto);
   }
 
-  @Put(':id')
+  @Put('update/:id')
   async updateUser(
     @Param('id') id: string,
     @Body() createUserDto: CreateUserDto,
