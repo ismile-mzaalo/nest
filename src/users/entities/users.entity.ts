@@ -14,9 +14,6 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ array: true, nullable: true })
-  hobby: string[];
-
   @Column({ type: 'date', nullable: true })
   dateOfBirth: string;
 

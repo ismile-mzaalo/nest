@@ -28,31 +28,31 @@ export class UsersController {
 
   @Get()
   @Header('Cache-Control', 'none')
-  getUsers() {
-    return this.userService.getAllUsers();
+  async getUsers(): Promise<User[]> {
+    return await this.userService.getAllUsers();
   }
 
   @Post('create')
   async createUser(@Body() createuserDto: CreateUserDto): Promise<User> {
-    return this.userService.createUser(createuserDto);
+    return await this.userService.createUser(createuserDto);
   }
 
   @Put('update/:id')
   async updateUser(
     @Param('id') id: string,
     @Body() createUserDto: CreateUserDto,
-  ) {
-    return this.userService.updateUser(id, createUserDto);
+  ): Promise<User> {
+    return await this.userService.updateUser(id, createUserDto);
   }
 
   @Delete(':id')
   async deleteUser(@Param('id') id: string) {
-    return this.userService.deleteUser(id);
+    return await this.userService.deleteUser(id);
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string): Promise<User> {
-    return this.userService.getUserById(id);
+  async getUserById(@Param('id') id: string): Promise<User> {
+    return await this.userService.getUserById(id);
   }
 
   // @Get('redirect')
