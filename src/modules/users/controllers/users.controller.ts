@@ -3,38 +3,40 @@ import {
   Controller,
   Delete,
   Get,
-  Header,
-  HttpCode,
   Param,
-  ParseBoolPipe,
-  ParseIntPipe,
-  ParseUUIDPipe,
   Post,
   Put,
-  Query,
-  Redirect,
-  Req,
-  Res,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
-import { UsersService } from 'src/users/services/users.service';
-import { User } from '../entities/users.entity';
+import { ApiCreatedResponse, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto, LoginUserDto } from '@app/modules/users/dtos/users.dto';
+import { UsersService } from '@app/modules/users/services/users.service';
+import { User } from '../../../entities/users.entity';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  @Header('Cache-Control', 'none')
   async getUsers(): Promise<User[]> {
     return await this.userService.getAllUsers();
   }
 
   @Post('create')
+  @UsePipes(ValidationPipe)
+  @ApiCreatedResponse({
+    description: 'User Registration success',
+  })
   async createUser(@Body() createuserDto: CreateUserDto): Promise<User> {
     return await this.userService.createUser(createuserDto);
+  }
+
+  @Get('/login')
+  @UsePipes(ValidationPipe)
+  async loginUser(@Body() loginUser: LoginUserDto): Promise<User> {
+    return await this.userService.loginUser(loginUser);
   }
 
   @Put('update/:id')
@@ -54,27 +56,6 @@ export class UsersController {
   async getUserById(@Param('id') id: string): Promise<User> {
     return await this.userService.getUserById(id);
   }
-
-  // @Get('redirect')
-  // @Redirect('https://docs.nestjs.com', 302) //url and optional statuscode
-  // getRedirect(@Query('redirect') redirect: string) {
-  //   if (redirect && redirect === 'true') {
-  //     return { url: 'https://docs.nestjs.com/v5/' };
-  //   }
-  // }
-
-  // @Post('posts')
-  // createUsers(@Req() req:Request ,@Res() res:Response) {
-  //   console.log(req.body);
-  //   res.send("Created");
-  // }
-
-  // @Post('create')
-  // @UsePipes(new ValidationPipe())
-  // create(@Body() userData: CreateUserDto) {
-  //   console.log(userData);
-  //   return this.userService.createUser(userData);
-  // }
 }
 
 // Request Object below :-

@@ -7,19 +7,19 @@ import {
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './controllers/users.controller';
-import { AuthMiddleware } from './middlewares/auth.middleware';
-import { ScanMiddleware } from './middlewares/scan.middleware';
+import { AuthMiddleware } from '../../middlewares/auth.middleware';
+import { ScanMiddleware } from '../../middlewares/scan.middleware';
 import { UsersService } from './services/users.service';
-import { User } from './entities/users.entity';
+import { User } from '../../entities/users.entity';
+import { Post } from '@app/entities/post.entity';
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, Post])],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],
 })
-
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer

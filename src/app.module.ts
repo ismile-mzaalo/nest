@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from '@app/users/users.module';
-import { CommonModule } from '@app/common/common.module';
+import { UsersModule } from '@app/modules/users/users.module';
+import { PostModule } from '@app/modules/post/post.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { config } from './config/configuration';
@@ -14,7 +14,7 @@ import { DatabaseConfig } from './config/database.config';
       useClass: DatabaseConfig,
     }),
     UsersModule,
-    CommonModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],

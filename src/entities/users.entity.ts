@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Post } from './post.entity';
 
 //Feature from TypeORM
 // An auto generated uuid id-field and/or a createDateTime-, lastChangedDateTime-fields
@@ -14,6 +15,9 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Column({ type: 'varchar' })
+  password: string;
+
   @Column({ type: 'date', nullable: true })
   dateOfBirth: string;
 
@@ -25,4 +29,7 @@ export class User {
 
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
+
+  @OneToMany(() => Post, (post: Post) => post.user)
+  posts: Post[];
 }

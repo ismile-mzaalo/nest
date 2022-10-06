@@ -1,9 +1,9 @@
 import { Body, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/users.entity';
-import { CreateUserDto } from '../dtos/CreateUser.dto';
-import { CreateUserType } from '../interfaces/user.interface';
+import { User } from '../../../entities/users.entity';
+import { CreateUserDto, LoginUserDto } from '../dtos/users.dto';
+import { comparePassword, encodePassword } from '../../../utils/bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +14,9 @@ export class UsersService {
     if (!id) {
       throw new HttpException('id required', 400);
     }
-    const user = await this.repository.findOne({ where: { id } });
+    const user = await this.repository.findOne({
+      where: { id },
+    });
     if (!user) {
       throw new HttpException('user not found', HttpStatus.FORBIDDEN);
     }
@@ -22,7 +24,7 @@ export class UsersService {
   }
 
   //create new user
-  async createUser(createUserDto: CreateUserType) {
+  async createUser(createUserDto: CreateUserDto) {
     let { email } = createUserDto;
 
     let userExists = await this.repository.findOne({ where: { email } });
@@ -31,13 +33,32 @@ export class UsersService {
       throw new HttpException('email already exists', 404);
     }
 
-    const user: User = new User();
+    const password = encodePassword(createUserDto.password);
 
-    user.userName = createUserDto.userName;
-    user.email = createUserDto.email;
-    const newUser = await this.repository.save(user);
+    const newUser = this.repository.save({
+      ...createUserDto,
+      password,
+    });
 
     return newUser;
+  }
+
+  // login user
+  async loginUser(loginUser: LoginUserDto) {
+    const user = await this.repository.findOne({
+      where: { email: loginUser.email },
+    });
+
+    if (!user) {
+      throw new HttpException('user not exist', HttpStatus.NOT_FOUND);
+    }
+
+    const matchedPassword = comparePassword(loginUser.password, user.password);
+
+    if (!matchedPassword) {
+      throw new HttpException('Incorrect password', 401);
+    }
+    return user;
   }
 
   //get all users
