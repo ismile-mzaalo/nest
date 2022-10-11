@@ -54,7 +54,7 @@ export class PostService {
       throw new HttpException('post id required', 400);
     }
     const post = await this.repository.findOne({
-      where: { postId: id },
+      where: { id: id },
     });
     if (!post) {
       throw new HttpException('post not found', HttpStatus.FORBIDDEN);

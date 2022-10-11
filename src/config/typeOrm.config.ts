@@ -3,8 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
 import { Post } from '../entities/post.entity';
 import { User } from '../entities/users.entity';
-import { firstMigration1665149835175 } from '../../migrations/1665149835175-firstMigration';
-import { secondMigration1665150768775 } from '../../migrations/1665150768775-secondMigration';
+import { firstMigration1665392640227 } from '../../migrations/1665392640227-firstMigration';
+import { secondMigration1665393754954 } from '../../migrations/1665393754954-secondMigration';
+import { tagsColumnRemoved1665394220299 } from '../../migrations/1665394220299-tagsColumnRemoved';
 
 config();
 
@@ -19,8 +20,9 @@ export default new DataSource({
   database: configService.get('POSTGRES_DATABASE'),
   entities: [Post, User],
   synchronize: false,
-  migrations: [firstMigration1665149835175, secondMigration1665150768775],
-  // cli: {
-  //   migrationsDir: 'src/migrations',
-  // },
+  migrations: [
+    firstMigration1665392640227,
+    secondMigration1665393754954,
+    tagsColumnRemoved1665394220299,
+  ],
 });

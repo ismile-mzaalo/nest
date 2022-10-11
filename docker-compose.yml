@@ -9,7 +9,7 @@ services:
     volumes:
     - /data/postgres:/data/postgres
     env_file:
-    - docker.env
+    - .env
     networks:
     - postgres
  

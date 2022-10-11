@@ -6,12 +6,12 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersController } from './controllers/users.controller';
+import { UsersController } from '../users/controllers/users.controller';
 import { AuthMiddleware } from '../../middlewares/auth.middleware';
 import { ScanMiddleware } from '../../middlewares/scan.middleware';
 import { UsersService } from './services/users.service';
 import { User } from '../../entities/users.entity';
-import { Post } from '@app/entities/post.entity';
+import { Post } from '../../entities/post.entity';
 
 @Global()
 @Module({
