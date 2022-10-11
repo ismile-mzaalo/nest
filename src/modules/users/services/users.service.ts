@@ -39,6 +39,9 @@ export class UsersService {
       ...createUserDto,
       password,
     });
+    if (!newUser) {
+      throw new HttpException('user not created', HttpStatus.BAD_REQUEST);
+    }
 
     return newUser;
   }
