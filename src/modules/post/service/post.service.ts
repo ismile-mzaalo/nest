@@ -1,5 +1,5 @@
-import { Post } from '@app/entities/post.entity';
-import { User } from '@app/entities/users.entity';
+import { Post } from '../entities/post.entity';
+import { User } from '../../users/entities/users.entity';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -54,7 +54,7 @@ export class PostService {
       throw new HttpException('post id required', 400);
     }
     const post = await this.repository.findOne({
-      where: { id: id },
+      where: { postId: id },
     });
     if (!post) {
       throw new HttpException('post not found', HttpStatus.FORBIDDEN);

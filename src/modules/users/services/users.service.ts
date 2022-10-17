@@ -1,67 +1,108 @@
-import { Body, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../../entities/users.entity';
-import { CreateUserDto, LoginUserDto } from '../dtos/users.dto';
-import { comparePassword, encodePassword } from '../../../utils/bcrypt';
+import { User } from '../entities/users.entity';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from '../dtos/users.dto';
+import { comparePassword } from '../../../utils/bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private repository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private repository: Repository<User>,
+    private jwtService: JwtService,
+  ) {}
 
   //get user by id
-  async getUserById(id: string): Promise<User> {
-    if (!id) {
-      throw new HttpException('id required', 400);
+  async getUserById(id: string) {
+    try {
+      if (!id) {
+        return new HttpException('id required', 400);
+      }
+      const user = await this.repository.findOne({
+        where: { id },
+      });
+      if (!user) {
+        return new HttpException('user not found', HttpStatus.FORBIDDEN);
+      }
+      return user;
+    } catch {
+      return new BadRequestException('Bad Request');
     }
-    const user = await this.repository.findOne({
-      where: { id },
-    });
-    if (!user) {
-      throw new HttpException('user not found', HttpStatus.FORBIDDEN);
-    }
-    return user;
   }
 
   //create new user
   async createUser(createUserDto: CreateUserDto) {
-    let { email } = createUserDto;
+    try {
+      let { email } = createUserDto;
 
-    let userExists = await this.repository.findOne({ where: { email } });
+      let userExists = await this.repository.findOne({ where: { email } });
 
-    if (userExists) {
-      throw new HttpException('email already exists', 404);
+      if (userExists) {
+        return new HttpException('email already exists', 404);
+      }
+
+      const newUser = await this.repository.save(
+        this.repository.create(createUserDto),
+      );
+
+      if (!newUser) {
+        return new HttpException('user not created', HttpStatus.BAD_REQUEST);
+      }
+
+      const payload = { id: newUser.id };
+
+      const token = this.jwtService.sign(payload);
+
+      return {
+        id: newUser.id,
+        userName: newUser.userName,
+        email: newUser.email,
+        password: newUser.password,
+        token,
+      };
+    } catch (error) {
+      return new BadRequestException('Error creating user', error.message);
     }
-
-    const password = encodePassword(createUserDto.password);
-
-    const newUser = this.repository.save({
-      ...createUserDto,
-      password,
-    });
-    if (!newUser) {
-      throw new HttpException('user not created', HttpStatus.BAD_REQUEST);
-    }
-
-    return newUser;
   }
 
   // login user
   async loginUser(loginUser: LoginUserDto) {
-    const user = await this.repository.findOne({
-      where: { email: loginUser.email },
-    });
+    try {
+      const user = await this.repository.findOne({
+        where: { email: loginUser.email },
+      });
 
-    if (!user) {
-      throw new HttpException('user not exist', HttpStatus.NOT_FOUND);
+      if (!user) {
+        throw new BadRequestException('incorrect email');
+      }
+
+      const matchedPassword = comparePassword(
+        loginUser.password,
+        user.password,
+      );
+
+      if (!matchedPassword) {
+        return new HttpException('Incorret password', HttpStatus.FORBIDDEN);
+      }
+      if (user && matchedPassword) {
+        const payload = { id: user.id };
+
+        const token = this.jwtService.sign(payload);
+
+        return { ...user, token };
+      } else {
+        return new HttpException('invalid data', HttpStatus.FORBIDDEN);
+      }
+    } catch (error) {
+      return new HttpException('try try', error.message);
     }
-
-    const matchedPassword = comparePassword(loginUser.password, user.password);
-
-    if (!matchedPassword) {
-      throw new HttpException('Incorrect password', 401);
-    }
-    return user;
   }
 
   //get all users
@@ -70,30 +111,52 @@ export class UsersService {
   }
 
   //update user
-  async updateUser(id: string, updateUserDto: CreateUserDto) {
-    const user = await this.repository.findOne({ where: { id } });
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const user = await this.repository.findOne({ where: { id } });
 
-    if (!user) {
-      throw new HttpException('user not found', 404);
+      if (!user) {
+        return new HttpException('user not found', 404);
+      }
+      // const matchedPassword = comparePassword(
+      //   updateUserDto.password,
+      //   user.password,
+      // );
+      if (user) {
+        user.userName = updateUserDto.userName || user.userName;
+        user.email = updateUserDto.email || user.email;
+        user.password = updateUserDto.password || user.password;
+        user.isAdmin = updateUserDto.isAdmin || user.isAdmin;
+      }
+
+      const updatedUser = await this.repository.update(id, user);
+
+      //const updatedUser = await this.repository.findOne({ where: { id } });
+      if (!updatedUser) {
+        return new HttpException('user not updated', HttpStatus.FORBIDDEN);
+      }
+
+      // const payload = { id: updatedUser.id };
+
+      // const token = this.jwtService.sign(payload);
+
+      return { updatedUser };
+    } catch {
+      return new BadRequestException('Bad Request');
     }
-
-    const updateUser: User = new User();
-
-    updateUser.userName = updateUserDto.userName || user.userName;
-    updateUser.email = updateUserDto.email || user.email;
-    updateUser.isAdmin = updateUserDto.isAdmin || user.isAdmin;
-    updateUser.id = id;
-
-    return this.repository.save(updateUser);
   }
 
   //delete user
   async deleteUser(id: string) {
-    if (id) {
-      const deleteUser = this.repository.delete(id);
-      if (deleteUser) return 'User Removed';
-    } else {
-      throw new HttpException('bad request', HttpStatus.FORBIDDEN);
+    try {
+      if (id) {
+        const deleteUser = this.repository.delete(id);
+        if (deleteUser) return 'User Removed';
+      } else {
+        throw new HttpException('user not found', HttpStatus.FORBIDDEN);
+      }
+    } catch {
+      throw new BadRequestException('Bad Request');
     }
   }
 }

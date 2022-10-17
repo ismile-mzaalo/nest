@@ -6,13 +6,23 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiHeader, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto, LoginUserDto } from '@app/modules/users/dtos/users.dto';
-import { UsersService } from '@app/modules/users/services/users.service';
-import { User } from '../../../entities/users.entity';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiHeader,
+  ApiHeaders,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from '../dtos/users.dto';
+import { UsersService } from '../services/users.service';
+import { User } from '../entities/users.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { Any } from 'typeorm';
 
 @ApiTags('users')
 @Controller('users')
@@ -29,31 +39,36 @@ export class UsersController {
   @ApiCreatedResponse({
     description: 'User Registration success',
   })
-  async createUser(@Body() createuserDto: CreateUserDto): Promise<User> {
+  async createUser(@Body() createuserDto: CreateUserDto) {
     return await this.userService.createUser(createuserDto);
   }
 
-  @Get('/login')
-  @UsePipes(ValidationPipe)
-  async loginUser(@Body() loginUser: LoginUserDto): Promise<User> {
+  @Post('/login')
+  //@UsePipes(ValidationPipe)
+  async loginUser(@Body() loginUser: LoginUserDto) {
     return await this.userService.loginUser(loginUser);
   }
 
   @Put('update/:id')
+  @ApiBearerAuth('Authorization')
+  @UseGuards(AuthGuard('jwt'))
+  //@UsePipes(ValidationPipe)
   async updateUser(
     @Param('id') id: string,
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<User> {
-    return await this.userService.updateUser(id, createUserDto);
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return await this.userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   async deleteUser(@Param('id') id: string) {
     return await this.userService.deleteUser(id);
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<User> {
+  @UseGuards(AuthGuard('jwt'))
+  async getUserById(@Param('id') id: string) {
     return await this.userService.getUserById(id);
   }
 }
