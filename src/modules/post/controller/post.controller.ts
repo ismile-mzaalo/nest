@@ -4,9 +4,12 @@ import {
   Get,
   Param,
   Post,
+  Req,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from '../dtos/post.dto';
 import { PostService } from '../service/post.service';
@@ -22,9 +25,11 @@ export class PostController {
   }
 
   @Post('create')
-  @UsePipes(ValidationPipe)
-  async createPost(@Body() createPost: CreatePostDto) {
-    return await this.postService.createPost(createPost);
+  @UseGuards(AuthGuard('jwt'))
+  //@UsePipes(ValidationPipe)
+  async createPost(@Body() createPost: CreatePostDto, @Req() req: any) {
+    console.log('ttt', req.user.id);
+    return await this.postService.createPost(createPost, req);
   }
 
   @Get(':id')

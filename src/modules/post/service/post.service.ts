@@ -13,21 +13,21 @@ export class PostService {
   ) {}
 
   //create post
-  async createPost(createPost: CreatePostDto) {
-    const { userId } = createPost;
+  async createPost(createPost: CreatePostDto, req: any) {
+    // const { userId } = createPost;
 
-    const user = this.userRepository.findOne({
-      where: { id: userId },
-    });
+    // const user = this.userRepository.findOne({
+    //   where: { id: userId },
+    // });
 
-    if (!user) {
+    if (!req.user.id) {
       throw new HttpException('user detail not found', HttpStatus.FORBIDDEN);
     }
 
     const newPost = this.repository.create({
       title: createPost.title,
       description: createPost.description,
-      user: await user,
+      user: await req.user.id,
     });
 
     if (!newPost) {

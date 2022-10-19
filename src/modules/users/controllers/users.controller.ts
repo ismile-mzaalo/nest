@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Post,
   Put,
@@ -45,7 +46,11 @@ export class UsersController {
 
   @Post('/login')
   //@UsePipes(ValidationPipe)
-  async loginUser(@Body() loginUser: LoginUserDto) {
+  async loginUser(
+    @Body() loginUser: LoginUserDto,
+    //@Headers('country') country: string,
+  ) {
+    //console.log('country', country);
     return await this.userService.loginUser(loginUser);
   }
 

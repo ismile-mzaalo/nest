@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from './services/users.service';
@@ -10,15 +15,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKeyProvider: process.env.JWT_SECRET,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
   async validate(payload: any) {
-    const user = await this.usersService.getUserById(payload.id);
-    if (!user) {
-      throw new UnauthorizedException();
+    try {
+      const user = await this.usersService.getUserById(payload.id);
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+      console.log('userrr', user);
+      return user;
+    } catch {
+      throw new HttpException('token validation failed', HttpStatus.FORBIDDEN);
     }
-    return user;
   }
 }

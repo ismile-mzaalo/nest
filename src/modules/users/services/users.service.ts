@@ -151,7 +151,8 @@ export class UsersService {
     try {
       if (id) {
         const deleteUser = this.repository.delete(id);
-        if (deleteUser) return 'User Removed';
+
+        if (deleteUser) return { message: 'User deleted' };
       } else {
         throw new HttpException('user not found', HttpStatus.FORBIDDEN);
       }

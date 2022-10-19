@@ -15,6 +15,7 @@ import { UsersService } from './services/users.service';
 import { User } from './entities/users.entity';
 import { Post } from '../post/entities/post.entity';
 import { JwtStrategy } from './jwt.strategy';
+import { SetcountryinheaderMiddleware } from 'src/middlewares/setcountryinheader.middleware';
 
 @Global()
 @Module({
@@ -32,7 +33,11 @@ import { JwtStrategy } from './jwt.strategy';
   providers: [UsersService, JwtStrategy],
   exports: [UsersService],
 })
-export class UsersModule {}
+export class UsersModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SetcountryinheaderMiddleware).forRoutes(UsersController);
+  }
+}
 // export class UsersModule implements NestModule {
 //   configure(consumer: MiddlewareConsumer) {
 //     consumer
