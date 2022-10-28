@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common';
-//import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from './jwt.strategy';
 
 @Global()
 @Module({
   imports: [],
-  providers: [],
-  exports: [],
+  providers: [JwtStrategy],
+  exports: [JwtStrategy],
 })
 export class UtilsModule {}

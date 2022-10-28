@@ -8,13 +8,13 @@ import {
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersController } from '../users/controllers/users.controller';
-import { AuthMiddleware } from '../../middlewares/auth.middleware';
-import { ScanMiddleware } from '../../middlewares/scan.middleware';
+import { UsersController } from './controllers/users.controller';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { ScanMiddleware } from '../middlewares/scan.middleware';
 import { UsersService } from './services/users.service';
 import { User } from './entities/users.entity';
 import { Post } from '../post/entities/post.entity';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from '../utils/jwt.strategy';
 import { SetcountryinheaderMiddleware } from 'src/middlewares/setcountryinheader.middleware';
 
 @Global()

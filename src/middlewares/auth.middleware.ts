@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/modules/users/entities/users.entity';
+import { User } from 'src/users/entities/users.entity';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

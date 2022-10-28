@@ -17,7 +17,7 @@ class UsersServiceMock {
   }
 
   loginUser(dto: any) {
-    return {};
+    return { name: 'john' };
   }
 
   getAllUsers(id: string, dto: any) {
@@ -35,10 +35,10 @@ class UsersServiceMock {
 
 describe.only('UsersService', () => {
   let usersService: UsersService;
-  let sandbox: sinon.SinonSandbox;
+  //let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
-    sandbox = sinon.createSandbox();
+    //sandbox = sinon.createSandbox();
 
     const UsersServiceProvider = {
       provide: UsersService,
@@ -69,16 +69,23 @@ describe.only('UsersService', () => {
 
   it('should call createUser method with CreateUserDto', () => {
     const createUserSpy = jest.spyOn(usersService, 'createUser');
+
+    // type cDto = {
+    //   name: string;
+    // };
     const dto = new CreateUserDto();
     usersService.createUser(dto);
     expect(createUserSpy).toHaveBeenCalledWith(dto);
+    expect(createUserSpy).toHaveLastReturnedWith({});
   });
 
   it('should call loginUser method with LoginUserDto', () => {
     const loginUserSpy = jest.spyOn(usersService, 'loginUser');
     const dto = new LoginUserDto();
     usersService.loginUser(dto);
+    //expecting this function should be called with dto type argument
     expect(loginUserSpy).toHaveBeenCalledWith(dto);
+    expect(loginUserSpy).toHaveReturnedWith({ name: 'john' });
   });
 
   // it('should be defined', () => {

@@ -12,6 +12,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Post } from '../../post/entities/post.entity';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { Exclude } from 'class-transformer';
 
 //Feature from TypeORM
 // An auto generated uuid id-field and/or a createDateTime-, lastChangedDateTime-fields
@@ -27,6 +28,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Exclude()
   @Column({ type: 'varchar' })
   password: string;
 

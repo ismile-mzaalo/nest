@@ -31,7 +31,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  //Exception handler
+  //Exception handler globally
   //app.useGlobalFilters(new GlobalExceptionFilter());
 
   const configService = new ConfigService();

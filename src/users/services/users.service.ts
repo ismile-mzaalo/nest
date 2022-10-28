@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/users.entity';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from '../dtos/users.dto';
-import { comparePassword } from '../../../utils/bcrypt';
+import { comparePassword } from '../../utils/bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -56,7 +56,11 @@ export class UsersService {
         return new HttpException('user not created', HttpStatus.BAD_REQUEST);
       }
 
-      const payload = { id: newUser.id };
+      const payload = {
+        id: newUser.id,
+        isAdmin: newUser.isAdmin,
+        email: newUser.email,
+      };
 
       const token = this.jwtService.sign(payload);
 
@@ -92,7 +96,11 @@ export class UsersService {
         return new HttpException('Incorret password', HttpStatus.FORBIDDEN);
       }
       if (user && matchedPassword) {
-        const payload = { id: user.id };
+        const payload = {
+          id: user.id,
+          isAdmin: user.isAdmin,
+          email: user.email,
+        };
 
         const token = this.jwtService.sign(payload);
 
@@ -122,39 +130,48 @@ export class UsersService {
       //   updateUserDto.password,
       //   user.password,
       // );
-      if (user) {
-        user.userName = updateUserDto.userName || user.userName;
-        user.email = updateUserDto.email || user.email;
-        user.password = updateUserDto.password || user.password;
-        user.isAdmin = updateUserDto.isAdmin || user.isAdmin;
-      }
+      // if (user) {
+      //   user.userName = updateUserDto.userName || user.userName;
+      //   user.email = updateUserDto.email || user.email;
+      //   user.password = updateUserDto.password || user.password;
+      //   user.isAdmin = updateUserDto.isAdmin || user.isAdmin;
+      // }
 
-      const updatedUser = await this.repository.update(id, user);
+      let updateUser = await this.repository.update(id, updateUserDto);
 
-      //const updatedUser = await this.repository.findOne({ where: { id } });
-      if (!updatedUser) {
+      if (!updateUser) {
         return new HttpException('user not updated', HttpStatus.FORBIDDEN);
       }
 
-      // const payload = { id: updatedUser.id };
+      let updatedUser = await this.repository.findOne({ where: { id } });
 
-      // const token = this.jwtService.sign(payload);
+      const payload = {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+      };
 
-      return { updatedUser };
+      const token = this.jwtService.sign(payload);
+
+      return { updatedUser, token };
     } catch {
       return new BadRequestException('Bad Request');
     }
   }
 
   //delete user
-  async deleteUser(id: string) {
+  async deleteUser(id: string, req: any) {
     try {
-      if (id) {
+      let user = req.user;
+      if (id === user.id) {
         const deleteUser = this.repository.delete(id);
 
         if (deleteUser) return { message: 'User deleted' };
       } else {
-        throw new HttpException('user not found', HttpStatus.FORBIDDEN);
+        throw new HttpException(
+          'user not found or matched',
+          HttpStatus.FORBIDDEN,
+        );
       }
     } catch {
       throw new BadRequestException('Bad Request');

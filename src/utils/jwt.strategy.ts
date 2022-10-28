@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UsersService } from './services/users.service';
+import { UsersService } from '../users/services/users.service';
 require('dotenv').config();
 
 @Injectable()

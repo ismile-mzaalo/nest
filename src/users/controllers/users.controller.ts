@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -67,8 +68,8 @@ export class UsersController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  async deleteUser(@Param('id') id: string) {
-    return await this.userService.deleteUser(id);
+  async deleteUser(@Param('id') id: string, @Req() req: any) {
+    return await this.userService.deleteUser(id, req);
   }
 
   @Get(':id')
