@@ -8,11 +8,14 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   AfterLoad,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Post } from '../../post/entities/post.entity';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Exclude } from 'class-transformer';
+import { Profile } from '../../profile/entities/profile.entity';
 
 //Feature from TypeORM
 // An auto generated uuid id-field and/or a createDateTime-, lastChangedDateTime-fields
@@ -50,6 +53,10 @@ export class User {
 
   @OneToMany(() => Post, (post: Post) => post.user)
   posts: Post[];
+
+  @OneToOne(() => Profile, (profile) => profile.user)
+  @JoinColumn()
+  profile: Profile;
 
   @BeforeUpdate()
   @BeforeInsert()

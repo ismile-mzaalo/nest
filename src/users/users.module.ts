@@ -20,7 +20,8 @@ import { SetcountryinheaderMiddleware } from 'src/middlewares/setcountryinheader
 @Global()
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Post]), //configuring strategy and jwt
+    TypeOrmModule.forFeature([User, Post]),
+    //configuring strategy and jwt
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secretOrPrivateKey: process.env.JWT_SECRET,
