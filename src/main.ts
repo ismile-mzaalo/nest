@@ -17,7 +17,6 @@ async function bootstrap() {
     .setTitle('Users API Example')
     .setDescription('A Demo API with CURD operation ')
     .setVersion('1.0')
-    .addTag('Nest-Api')
     .addBearerAuth(
       {
         description: `Please enter token in following format: Bearer <JWT>`,

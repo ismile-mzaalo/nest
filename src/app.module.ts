@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-
 import { UsersModule } from './users/users.module';
 import { PostModule } from './post/post.module';
 import { ConfigModule } from '@nestjs/config';

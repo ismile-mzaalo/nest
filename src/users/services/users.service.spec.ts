@@ -64,7 +64,9 @@ describe.only('UsersService', () => {
     //const findOneOptions: FindOneOptions = {};
     let id: string = '1234';
     usersService.getUserById(id);
+    let user: any;
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
+    expect(getUserByIdSpy).toHaveReturnedWith(user);
   });
 
   it('should call createUser method with CreateUserDto', () => {
